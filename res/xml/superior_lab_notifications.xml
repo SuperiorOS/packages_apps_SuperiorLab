@@ -22,6 +22,13 @@
     <PreferenceCategory
         android:title="@string/general_category">
 
+        <!-- Heads up -->
+        <com.superior.support.preferences.GlobalSettingSwitchPreference
+            android:key="heads_up_notifications_enabled"
+            android:order="30"
+            android:title="@string/heads_up_notifications_enabled_title"
+            android:summary="@string/heads_up_notifications_enabled_summary" />
+
         <!-- Less boring heads up -->
         <com.superior.support.preferences.SystemSettingSwitchPreference
             android:key="less_boring_heads_up"
