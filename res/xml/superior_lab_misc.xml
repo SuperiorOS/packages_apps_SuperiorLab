@@ -8,6 +8,14 @@ SPDX-License-Identifier: Apache-2.0
     android:title="@string/misc_title"
     xmlns:settings="http://schemas.android.com/apk/res/com.android.settings">
 
+    <!-- Hide developer status in about phone -->
+    <Preference
+        android:key="hide_developer_status_settings"
+        android:title="@string/hide_developer_status_title"
+        android:summary="@string/hide_developer_status_summary"
+        android:fragment="com.superior.lab.fragments.HideDeveloperStatusSettings"
+        settings:controller="com.superior.lab.fragments.HideDeveloperStatusPreferenceController" />
+
     <!-- Ignore Secure Window -->
     <com.superior.support.preferences.GlobalSettingSwitchPreference
         android:key="window_ignore_secure"

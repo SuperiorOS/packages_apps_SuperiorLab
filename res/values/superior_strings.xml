@@ -313,4 +313,12 @@ SPDX-License-Identifier: Apache-2.0
     <!-- Hide screen capture status -->
     <string name="hide_screen_capture_status_title">Hide screen capture status</string>
     <string name="hide_screen_capture_status_summary">Hide screen capture/record status from apps. Useful but may risk privacy. Restart apps to apply.</string>
+
+    <!-- Hide developer status -->
+    <string name="hide_developer_status_title">Hide developer status</string>
+    <string name="hide_developer_status_summary">Hide developer status from apps</string>
+
+    <!-- Search (used by the app list pickers) -->
+    <string name="search">Search</string>
+    <string name="search_apps">Search apps</string>
 </resources>
