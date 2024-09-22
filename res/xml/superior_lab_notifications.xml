@@ -25,18 +25,22 @@
         <!-- Heads up -->
         <com.superior.support.preferences.GlobalSettingSwitchPreference
             android:key="heads_up_notifications_enabled"
-            android:order="30"
             android:title="@string/heads_up_notifications_enabled_title"
             android:summary="@string/heads_up_notifications_enabled_summary" />
 
         <!-- Less boring heads up -->
         <com.superior.support.preferences.SystemSettingSwitchPreference
             android:key="less_boring_heads_up"
-            android:order="31"
             android:title="@string/notifications_less_boring_heads_up_title"
             android:summary="@string/notifications_less_boring_heads_up_summary"
             android:defaultValue="false"
             android:dependency="heads_up_notifications_enabled" />
+
+        <com.superior.support.preferences.SystemSettingSwitchPreference
+             android:key="notification_sound_vib_screen_on"
+             android:title="@string/notification_sound_vib_screen_on_title"
+             android:summary="@string/notification_sound_vib_screen_on_summary"
+             android:defaultValue="true" />
 
     </PreferenceCategory>
 </PreferenceScreen>
