@@ -16,6 +16,13 @@ SPDX-License-Identifier: Apache-2.0
         android:fragment="com.superior.lab.fragments.HideDeveloperStatusSettings"
         settings:controller="com.superior.lab.fragments.HideDeveloperStatusPreferenceController" />
 
+    <!-- Hide app list -->
+    <Preference
+        android:key="hide_applist_setting"
+        android:title="@string/hide_applist_title"
+        android:summary="@string/hide_applist_summary"
+        android:fragment="com.superior.lab.fragments.HideAppListSettings" />
+
     <!-- Ignore Secure Window -->
     <com.superior.support.preferences.GlobalSettingSwitchPreference
         android:key="window_ignore_secure"

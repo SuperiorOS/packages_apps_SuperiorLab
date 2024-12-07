@@ -321,4 +321,10 @@ SPDX-License-Identifier: Apache-2.0
     <!-- Search (used by the app list pickers) -->
     <string name="search">Search</string>
     <string name="search_apps">Search apps</string>
+
+    <!-- Hide applist -->
+    <string name="hide_applist_title">Hide applist</string>
+    <string name="hide_applist_summary">Prevent apps from checking selected apps from appslist</string>
+    <string name="menu_show_overlay">Show overlay</string>
+    <string name="menu_hide_overlay">Hide overlay</string>
 </resources>
