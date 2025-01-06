@@ -15,37 +15,37 @@
             android:icon="@drawable/ic_settings_team"
             settings:layout="@layout/superior_dashboard_preference_single"/>
 
-        <!-- Status Bar -->
+        <!-- Status Bar ->
         <Preference
             android:key="statusbar_category"
             android:title="@string/statusbar_title"
             android:fragment="com.superior.lab.fragments.StatusBarSettings" 
             settings:layout="@layout/superior_dashboard_preference_top"
-            android:icon="@drawable/ic_settings_statusbar"/>
+            android:icon="@drawable/ic_settings_statusbar"/> -->
 
-        <!-- Quick Settings panel -->
+        <!-- Quick Settings panel ->
         <Preference
             android:key="quicksettings_category"
             android:title="@string/quicksettings_title"
             android:fragment="com.superior.lab.fragments.QuickSettings"
             settings:layout="@layout/superior_dashboard_preference_bottom"
-            android:icon="@drawable/ic_settings_quicksettings"/>
+            android:icon="@drawable/ic_settings_quicksettings"/> -->
 
-        <!-- Buttons -->
+        <!-- Buttons ->
         <Preference
             android:key="buttonsettings_category"
             android:title="@string/button_title"
             android:fragment="com.superior.lab.fragments.ButtonSettings"
             settings:layout="@layout/superior_dashboard_preference_top"
-            android:icon="@drawable/ic_settings_buttons"/>
+            android:icon="@drawable/ic_settings_buttons"/> -->
 
-        <!-- Navigation Bar -->
+        <!-- Navigation Bar ->
         <Preference
             android:key="navigationbar_category"
             android:title="@string/navbar_title" 
             android:fragment="com.superior.lab.fragments.NavbarSettings"
             settings:layout="@layout/superior_dashboard_preference_bottom"
-            android:icon="@drawable/ic_settings_navbar"/>
+            android:icon="@drawable/ic_settings_navbar"/> -->
 
         <!-- Gestures -->
         <Preference
@@ -60,32 +60,32 @@
             android:key="lockscreen_category"
             android:title="@string/lockscreen_title" 
             android:fragment="com.superior.lab.fragments.LockScreenSettings"
-            settings:layout="@layout/superior_dashboard_preference_bottom"
+            settings:layout="@layout/superior_dashboard_preference_middle"
             android:icon="@drawable/ic_settings_lockscreens"/>
 
-        <!-- Power Menu -->
+        <!-- Power Menu ->
         <Preference
             android:key="powermenu__category"
             android:title="@string/powermenu_title" 
             android:fragment="com.superior.lab.fragments.PowerMenuSettings"
             settings:layout="@layout/superior_dashboard_preference_top"
-            android:icon="@drawable/ic_settings_powermenu"/>
+            android:icon="@drawable/ic_settings_powermenu"/> -->
 
-        <!-- Themes -->
+        <!-- Themes ->
         <Preference
             android:key="themes"
             android:fragment="com.superior.lab.fragments.ThemesSettings"
             android:icon="@drawable/ic_settings_themes"
             settings:layout="@layout/superior_dashboard_preference_bottom"
-            android:title="@string/themes_title" />
+            android:title="@string/themes_title" /> -->
 
-        <!-- Notifications -->
+        <!-- Notifications ->
         <Preference
             android:key="notifications_category"
             android:title="@string/notifications_title"
             android:fragment="com.superior.lab.fragments.NotificationSettings"
             settings:layout="@layout/superior_dashboard_preference_top"
-            android:icon="@drawable/ic_settings_notifications"/>
+            android:icon="@drawable/ic_settings_notifications"/> -->
 
         <!-- Misc -->
         <Preference
