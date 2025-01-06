@@ -50,19 +50,8 @@
         android:key="dev4"
         android:title="@string/dev_4"
         android:icon="@drawable/ic_code"
-        settings:layout="@layout/superior_dashboard_preference_middle"
-        android:summary="@string/dev4_description">
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:data="https://t.me/adnan_fays" />
-    </Preference>
-
-    <Preference
-        android:key="dev5"
-        android:title="@string/dev_5"
-        android:icon="@drawable/ic_code"
         settings:layout="@layout/superior_dashboard_preference_bottom"
-        android:summary="@string/dev5_description">
+        android:summary="@string/dev4_description">
         <intent
             android:action="android.intent.action.VIEW"
             android:data="https://t.me/arc_ff5f00" />
@@ -110,72 +99,22 @@
         android:key="mentions_yash"
         android:title="@string/mentions_yash"
         android:icon="@drawable/ic_devs_mention"
-        settings:layout="@layout/superior_dashboard_preference_bottom"
+        settings:layout="@layout/superior_dashboard_preference_middle"
         android:summary="@string/mentions_yash_description">
         <intent
             android:action="android.intent.action.VIEW"
             android:data="https://t.me/Introdructor" />
     </Preference>
 
-    <PreferenceCategory
-        android:key="maintainer"
-        android:title="@string/maintainers_header">
-
-        <Preference
-            android:summary="@string/maintainers_header_summary">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:data="https://www.github.com/SuperiorOS-Devices" />
-        </Preference>
-
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:key="maintainer"
-        android:title="@string/device_google">
-
-        <Preference
-            android:key="maintainer_shiba"
-            android:title="@string/device_shiba"
-            android:summary="@string/device_shiba_description"
-            settings:layout="@layout/superior_dashboard_preference_single"
-            android:icon="@drawable/ic_devs_phone">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:data="http://t.me/JD1811" />
-        </Preference>
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:key="maintainer"
-        android:title="@string/device_oneplus">
-
-        <Preference
-            android:key="maintainer_avicii"
-            android:title="@string/device_avicii"
-            android:summary="@string/device_avicii_description"
-            settings:layout="@layout/superior_dashboard_preference_single"
-            android:icon="@drawable/ic_devs_phone">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:data="http://t.me/Darkstar085" />
-        </Preference>
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:key="maintainer"
-        android:title="@string/device_xiaomi">
-
-        <Preference
-            android:key="maintainer_violet"
-            android:title="@string/device_violet"
-            android:summary="@string/device_violet_description"
-            settings:layout="@layout/superior_dashboard_preference_single"
-            android:icon="@drawable/ic_devs_phone">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:data="https://t.me/Joker_V2_0" />
-        </Preference>
-    </PreferenceCategory>
+    <Preference
+        android:key="mentions_adnan"
+        android:title="@string/mentions_adnan"
+        android:icon="@drawable/ic_devs_mention"
+        settings:layout="@layout/superior_dashboard_preference_bottom"
+        android:summary="@string/mentions_adnan_description">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="https://t.me/adnan_fays" />
+    </Preference>
 
 </PreferenceScreen>
