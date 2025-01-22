@@ -79,13 +79,13 @@
             settings:layout="@layout/superior_dashboard_preference_bottom"
             android:title="@string/themes_title" /> -->
 
-        <!-- Notifications ->
+        <!-- Notifications -->
         <Preference
             android:key="notifications_category"
             android:title="@string/notifications_title"
             android:fragment="com.superior.lab.fragments.NotificationSettings"
-            settings:layout="@layout/superior_dashboard_preference_top"
-            android:icon="@drawable/ic_settings_notifications"/> -->
+            settings:layout="@layout/superior_dashboard_preference_middle"
+            android:icon="@drawable/ic_settings_notifications"/>
 
         <!-- Misc -->
         <Preference
