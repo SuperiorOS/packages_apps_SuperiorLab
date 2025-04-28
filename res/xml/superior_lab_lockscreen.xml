@@ -24,16 +24,9 @@
             android:summary="@string/lockscreen_weather_summary" />
 
         <com.superior.support.preferences.SystemSettingSwitchPreference
-            android:key="lockscreen_weather_wind_info"
-            android:title="@string/lockscreen_weather_wind_info_title"
-            android:summary="@string/lockscreen_weather_wind_info_summary"
-            android:defaultValue="true"
-            android:dependency="lockscreen_weather_enabled" />
-
-        <com.superior.support.preferences.SystemSettingSwitchPreference
-            android:key="lockscreen_weather_humidity_info"
-            android:title="@string/lockscreen_weather_humidity_info_title"
-            android:summary="@string/lockscreen_weather_humidity_info_summary"
+            android:key="lockscreen_weather_extra_info"
+            android:title="@string/lockscreen_weather_extra_info_title"
+            android:summary="@string/lockscreen_weather_extra_info_summary"
             android:defaultValue="true"
             android:dependency="lockscreen_weather_enabled" />
 

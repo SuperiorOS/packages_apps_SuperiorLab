@@ -81,12 +81,10 @@
      <string name="weather_settings_title">Weather settings</string>
      <string name="weather_settings_summary">Setup icon pack and weather service</string>
      <string name="lockscreen_weather_title">Weather info</string>
-     <string name="lockscreen_weather_summary">Display current weather condition icon and temperature</string>
+     <string name="lockscreen_weather_summary">Display current weather condition icon, temperature and location</string>
      <string name="lockscreen_weather_enabled_info">Requires weather service to be enabled</string>
-     <string name="lockscreen_weather_wind_info_title">Wind info</string>
-     <string name="lockscreen_weather_wind_info_summary">Display current wind speed and direction</string>
-     <string name="lockscreen_weather_humidity_info_title">Humidity info</string>
-     <string name="lockscreen_weather_humidity_info_summary">Display current humidity in percentage</string>
+     <string name="lockscreen_weather_extra_info_title">Extra info</string>
+     <string name="lockscreen_weather_extra_info_summary">Display current wind speed, direction and humidity</string>
 
      <!-- Ignore window secure -->
      <string name="ignore_window_secure_title">Ignore window secure flags</string>
