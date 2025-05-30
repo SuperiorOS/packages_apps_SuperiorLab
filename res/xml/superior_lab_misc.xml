@@ -27,4 +27,10 @@
         android:summary="@string/use_photos_spoof_summary"
         android:defaultValue="true" />
 
+    <com.superior.support.preferences.SystemPropertySwitchPreference
+        android:key="persist.sys.spoof.vending_sdk32"
+        android:title="@string/spoofing_vending_32_title"
+        android:summary="@string/spoofing_vending_32_summary"
+        android:defaultValue="true" />
+
 </PreferenceScreen>

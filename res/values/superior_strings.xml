@@ -112,4 +112,8 @@
      <!-- Play integrity spoof -->
      <string name="use_gms_spoof_title">Play Integrity fix</string>
      <string name="use_gms_spoof_summary">Spoof your device to pass Google Play Attestation</string>
+
+     <!-- Spoof Play Store --> 
+     <string name="spoofing_vending_32_title">Spoof Play Store to SDK 32</string>
+     <string name="spoofing_vending_32_summary">Spoof Play Store to SDK 32 to get Legacy attestation</string>
 </resources>
