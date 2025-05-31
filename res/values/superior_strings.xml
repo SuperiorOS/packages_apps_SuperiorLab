@@ -116,4 +116,12 @@
      <!-- Spoof Play Store --> 
      <string name="spoofing_vending_32_title">Spoof Play Store to SDK 32</string>
      <string name="spoofing_vending_32_summary">Spoof Play Store to SDK 32 to get Legacy attestation</string>
+
+     <!-- Unlock FPS for specific games -->
+     <string name="use_games_spoof_title">Unlock higher FPS in games</string>
+     <string name="use_games_spoof_summary">Spoof your device as different model for specific games to unlock higher FPS</string>
+
+     <!-- Netflix Spoof -->
+     <string name="netflix_spoof_title">Netflix spoof</string>
+     <string name="netflix_spoof_summary">Spoof your device as different model for Netflix</string>
 </resources>
