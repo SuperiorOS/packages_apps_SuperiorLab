@@ -109,4 +109,7 @@
      <string name="notification_sound_vib_screen_on_title">Annoying Notifications</string>
      <string name="notification_sound_vib_screen_on_summary">Play sound and vibration for notifications when screen is on</string>
 
+     <!-- Keybox Data -->
+     <string name="keybox_data_title">Select keybox XML to spoof</string>
+     <string name="keybox_data_summary">Select keybox XML used for key attestation spoofing for all apps system wide. Click the delete button in order to reset the keybox data values used by the system.</string>
 </resources>
