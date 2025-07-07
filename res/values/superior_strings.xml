@@ -105,6 +105,10 @@
      <string name="pi_spoof_title">Google Play Integrity spoof</string>
      <string name="pi_spoof_summary">Spoof your device as different model for Google Play Integrity</string>
 
+     <!-- Pixel FP Spoof -->
+     <string name="pixel_fp_spoof_title">Pixel FP Spoof</string>
+     <string name="pixel_fp_spoof_summary">Spoof your device as Google Pixel</string>
+
      <!-- Annoying Notifications -->
      <string name="notification_sound_vib_screen_on_title">Annoying Notifications</string>
      <string name="notification_sound_vib_screen_on_summary">Play sound and vibration for notifications when screen is on</string>

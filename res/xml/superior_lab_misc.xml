@@ -22,6 +22,13 @@
         android:summary="@string/pi_spoof_summary"
         android:defaultValue="true" />
 
+    <!-- Pixel FP Spoof -->
+    <com.superior.support.preferences.SystemPropertySwitchPreference
+        android:key="persist.sys.pihooks.pixel"
+        android:title="@string/pixel_fp_spoof_title"
+        android:summary="@string/pixel_fp_spoof_summary"
+        android:defaultValue="true" />
+
     <com.superior.lab.fragments.KeyboxDataPreference
         android:key="keybox_data_setting"
         android:title="@string/keybox_data_title"
