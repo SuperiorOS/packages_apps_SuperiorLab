@@ -17,7 +17,6 @@
         android:key="dev1"
         android:title="@string/dev_1"
         android:icon="@drawable/ic_code"
-        settings:layout="@layout/superior_dashboard_preference_top"
         android:summary="@string/dev1_description">
         <intent
             android:action="android.intent.action.VIEW"
@@ -28,7 +27,6 @@
         android:key="dev2"
         android:title="@string/dev_2"
         android:icon="@drawable/ic_code"
-        settings:layout="@layout/superior_dashboard_preference_middle"
         android:summary="@string/dev2_description">
         <intent
             android:action="android.intent.action.VIEW"
@@ -39,7 +37,6 @@
         android:key="dev3"
         android:title="@string/dev_3"
         android:icon="@drawable/ic_code"
-        settings:layout="@layout/superior_dashboard_preference_middle"
         android:summary="@string/dev3_description">
         <intent
             android:action="android.intent.action.VIEW"
@@ -50,7 +47,6 @@
         android:key="dev4"
         android:title="@string/dev_4"
         android:icon="@drawable/ic_code"
-        settings:layout="@layout/superior_dashboard_preference_bottom"
         android:summary="@string/dev4_description">
         <intent
             android:action="android.intent.action.VIEW"
@@ -66,7 +62,6 @@
         android:key="mentions_pavan"
         android:title="@string/mentions_pavan"
         android:icon="@drawable/ic_devs_mention"
-        settings:layout="@layout/superior_dashboard_preference_top"
         android:summary="@string/mentions_pavan_description">
         <intent
             android:action="android.intent.action.VIEW"
@@ -77,7 +72,6 @@
         android:key="mentions_sam"
         android:title="@string/mentions_sam"
         android:summary="@string/mentions_sam_description"
-        settings:layout="@layout/superior_dashboard_preference_middle"
         android:icon="@drawable/ic_devs_mention">
         <intent
             android:action="android.intent.action.VIEW"
@@ -88,7 +82,6 @@
         android:key="mentions_iacob"
         android:title="@string/mentions_iacob"
         android:summary="@string/mentions_iacob_description"
-        settings:layout="@layout/superior_dashboard_preference_middle"
         android:icon="@drawable/ic_devs_mention">
         <intent
             android:action="android.intent.action.VIEW"
@@ -99,7 +92,6 @@
         android:key="mentions_yash"
         android:title="@string/mentions_yash"
         android:icon="@drawable/ic_devs_mention"
-        settings:layout="@layout/superior_dashboard_preference_middle"
         android:summary="@string/mentions_yash_description">
         <intent
             android:action="android.intent.action.VIEW"
@@ -110,7 +102,6 @@
         android:key="mentions_adnan"
         android:title="@string/mentions_adnan"
         android:icon="@drawable/ic_devs_mention"
-        settings:layout="@layout/superior_dashboard_preference_bottom"
         android:summary="@string/mentions_adnan_description">
         <intent
             android:action="android.intent.action.VIEW"
