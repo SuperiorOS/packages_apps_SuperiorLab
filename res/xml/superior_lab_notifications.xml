@@ -19,4 +19,17 @@
     android:title="@string/notifications_title"
     xmlns:settings="http://schemas.android.com/apk/res/com.android.settings">
 
+    <PreferenceCategory
+        android:title="@string/general_category">
+
+        <!-- Less boring heads up -->
+        <com.superior.support.preferences.SystemSettingSwitchPreference
+            android:key="less_boring_heads_up"
+            android:order="31"
+            android:title="@string/notifications_less_boring_heads_up_title"
+            android:summary="@string/notifications_less_boring_heads_up_summary"
+            android:defaultValue="false"
+            android:dependency="heads_up_notifications_enabled" />
+
+    </PreferenceCategory>
 </PreferenceScreen>
