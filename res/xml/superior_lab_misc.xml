@@ -23,6 +23,13 @@ SPDX-License-Identifier: Apache-2.0
         android:summary="@string/hide_applist_summary"
         android:fragment="com.superior.lab.fragments.HideAppListSettings" />
 
+    <!-- Play Integrity Fix -->
+    <Preference
+        android:key="play_integrity_fix"
+        android:title="@string/spoof_pif_title"
+        android:summary="@string/spoof_pif_summary"
+        android:fragment="com.superior.lab.fragments.PlayIntegrityFix" />
+
     <!-- Ignore Secure Window -->
     <com.superior.support.preferences.GlobalSettingSwitchPreference
         android:key="window_ignore_secure"
