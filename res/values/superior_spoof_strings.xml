@@ -15,6 +15,8 @@
     <string name="play_integrity_fix_summary">Manage PIF configuration and device fingerprints for basic integrity</string>
     <string name="tricky_store_title">TrickyStore</string>
     <string name="tricky_store_summary">Manage keybox and target apps for attestation for strong integrity</string>
+    <string name="game_spoofing_title">App spoofing</string>
+    <string name="game_spoofing_summary">Spoof device properties for specific apps</string>
     <!-- Spoofing: shared -->
     <string name="spoof_wipe_playstore_title">Clear Play Store data?</string>
     <string name="spoof_wipe_playstore_message">Integrity verdicts are cached by the Play Store. Clearing its data makes the new configuration take effect right away, but signs the Play Store out and clears its download queue.</string>
@@ -198,6 +200,33 @@
     <string name="ts_mode_leaf">Leaf</string>
     <string name="ts_mode_cert">Cert</string>
     <string name="ts_mode_skip">Skip</string>
+    <!-- App Spoofing -->
+    <string name="gs_disabled">Disabled</string>
+    <string name="gs_configured_count">%d apps configured</string>
+    <string name="gs_add_app">Add app</string>
+    <string name="gs_configured_apps">Configured apps</string>
+    <string name="gs_no_apps">No apps configured</string>
+    <string name="gs_no_apps_summary">Tap \"Add app\" to get started</string>
+    <string name="gs_no_matching_apps">No matching apps</string>
+    <string name="gs_select_app">Select app</string>
+    <string name="gs_select_profile">Select device profile</string>
+    <string name="gs_profile_custom">Custom</string>
+    <string name="gs_profile_custom_ellipsis">Custom…</string>
+    <string name="gs_edit_props_short">Edit</string>
+    <string name="gs_profile_short">Profile</string>
+    <string name="gs_remove">Remove</string>
+    <string name="gs_remove_title">Remove app?</string>
+    <string name="gs_remove_message">Remove %s from app spoofing?</string>
+    <string name="gs_edit_app">Edit %s</string>
+    <string name="gs_edit_hint">Pick field names such as MODEL, MANUFACTURER, BRAND or DEVICE. Empty rows are ignored.</string>
+    <string name="gs_key">Field</string>
+    <string name="gs_value">Value</string>
+    <string name="gs_invalid_value">%s has an invalid value</string>
+    <string name="gs_add_property">Add field</string>
+    <string name="gs_invalid_key">%s isn\'t a supported field. Pick one from the list or remove the row.</string>
+    <string name="gs_duplicate_key">Each field can only be set once</string>
+    <string name="gs_save">Save</string>
+    <string name="gs_footer_body">The selected app sees the chosen device identity in its Build fields. Apps are restarted when their configuration changes. Some games use this to unlock higher frame rates or graphics settings.</string>
     <!-- Play Integrity Fix -->
     <string-array name="pif_verbose_logs_entries" translatable="false">
         <item>@string/pif_verbose_logs_off</item>

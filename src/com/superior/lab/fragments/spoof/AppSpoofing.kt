@@ -1,0 +1,872 @@
+/*
+ * SPDX-FileCopyrightText: crDroid Android Project
+ * SPDX-FileCopyrightText: SuperiorOS
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+
+package com.superior.lab.fragments.spoof
+
+import android.app.ActivityManager
+import android.content.pm.ApplicationInfo
+import android.graphics.drawable.Drawable
+import android.os.Bundle
+import android.provider.Settings
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.DeleteOutline
+import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.ExpandLess
+import androidx.compose.material.icons.rounded.ExpandMore
+import androidx.compose.material.icons.rounded.PhoneAndroid
+import androidx.compose.material.icons.rounded.SportsEsports
+import androidx.compose.material.icons.rounded.SwapHoriz
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import com.android.internal.logging.nano.MetricsProto
+import com.android.settings.R
+import com.android.settings.SettingsPreferenceFragment
+import com.android.settingslib.spa.framework.theme.SettingsTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
+import java.util.Locale
+
+/**
+ * Per-game Build property overrides, stored as JSON in spoof_appprops_config and applied by
+ * AppPropsSpoofService when the game's process starts:
+ *
+ *     { "enabled": true, "debug": false, "apps": { "<pkg>": { "MODEL": "...", ... } } }
+ *
+ * The service loads the config once per process, so every change force-stops the games it
+ * touches. Keys are picked from [AppSpoofing.SPOOFABLE_FIELDS] rather than typed, so a
+ * misspelt field name can no longer be saved.
+ */
+class AppSpoofing : SettingsPreferenceFragment() {
+
+    internal data class GameEntry(
+        val packageName: String,
+        val label: String,
+        val icon: Drawable?,
+        val props: Map<String, String>,
+    )
+
+    internal data class SpoofField(
+        val name: String,
+        val owner: String,
+        val example: String,
+        val pattern: Regex? = null,
+    ) {
+        val qualifiedName: String get() = "$owner.$name"
+
+        fun isValid(value: String): Boolean =
+            value.none { it.isISOControl() } && (pattern?.matches(value) ?: true)
+    }
+
+    internal sealed interface GsDialog {
+        object AddGame : GsDialog
+        class Profile(val packageName: String, val label: String) : GsDialog
+        class EditProps(val packageName: String, val label: String, val props: Map<String, String>) : GsDialog
+        class Remove(val packageName: String, val label: String) : GsDialog
+    }
+
+    internal class GsUiState {
+        var loading by mutableStateOf(true)
+        var enabled by mutableStateOf(false)
+        val games = mutableStateListOf<GameEntry>()
+        var dialog by mutableStateOf<GsDialog?>(null)
+
+        var appsLoading by mutableStateOf(false)
+        var installedApps by mutableStateOf<List<AppListEntry>>(emptyList())
+    }
+
+    private val ui = GsUiState()
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+
+    /** Config keys other than "enabled", "apps" and "games" (e.g. "debug"), written back unchanged. */
+    private var extraKeys: JSONObject = JSONObject()
+
+    /** Bumped on every save, so a load that started before the save doesn't overwrite it. */
+    private var saveGeneration = 0
+
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {}
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requireActivity().title = getString(R.string.game_spoofing_title)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View = spoofComposeView(requireContext()).apply {
+        val fragment = this@AppSpoofing
+        setContent {
+            SettingsTheme {
+                AppSpoofingContent(
+                    state = ui,
+                    onEnabledChange = fragment::setSpoofingEnabled,
+                    onAddGame = fragment::openAddGame,
+                    onPickApp = { app ->
+                        ui.dialog = GsDialog.Profile(app.packageName, app.label)
+                    },
+                    onPickProfile = fragment::applyProfile,
+                    onSaveProps = fragment::saveProps,
+                    onRemove = fragment::removeGame,
+                )
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadConfig()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        scope.cancel()
+    }
+
+    override fun getMetricsCategory(): Int = MetricsProto.MetricsEvent.SUPERIOR
+
+    // ---- Config I/O ------------------------------------------------------------------------
+
+    private fun loadConfig() {
+        val startedAt = saveGeneration
+        val context = requireContext()
+        val pm = context.packageManager
+        val resolver = context.contentResolver
+        scope.launch {
+            val (enabled, games, extras) = withContext(Dispatchers.IO) {
+                val parsed = parseConfig(Settings.Secure.getString(resolver, APPPROPS_CONFIG_KEY))
+                Triple(
+                    parsed.first,
+                    parsed.second.map { (pkg, props) ->
+                        val info = runCatching { pm.getApplicationInfo(pkg, 0) }.getOrNull()
+                        GameEntry(
+                            packageName = pkg,
+                            label = info?.let { pm.getApplicationLabel(it).toString() } ?: pkg,
+                            icon = info?.let { runCatching { pm.getApplicationIcon(it) }.getOrNull() },
+                            props = props,
+                        )
+                    }.sortedBy { it.label.lowercase(Locale.getDefault()) },
+                    parsed.third,
+                )
+            }
+            // The user changed something while this was reading; the screen is newer.
+            if (saveGeneration != startedAt) {
+                ui.loading = false
+                return@launch
+            }
+            ui.enabled = enabled
+            extraKeys = extras
+            ui.games.clear()
+            ui.games.addAll(games)
+            ui.loading = false
+        }
+    }
+
+    private fun saveConfig() {
+        saveGeneration++
+        try {
+            val json = JSONObject(extraKeys.toString())
+            json.put("enabled", ui.enabled)
+            val gamesObj = JSONObject()
+            ui.games.forEach { game ->
+                val propsObj = JSONObject()
+                game.props.forEach { (k, v) -> propsObj.put(k, v) }
+                gamesObj.put(game.packageName, propsObj)
+            }
+            json.remove("games")
+            json.put("apps", gamesObj)
+            Settings.Secure.putString(
+                requireContext().contentResolver, APPPROPS_CONFIG_KEY, json.toString(2))
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to save config", e)
+        }
+    }
+
+    private fun restart(packages: Collection<String>) {
+        val am = requireContext().getSystemService(ActivityManager::class.java)
+        killPackages(am, packages.toSet())
+    }
+
+    // ---- Actions ---------------------------------------------------------------------------
+
+    private fun setSpoofingEnabled(enabled: Boolean) {
+        ui.enabled = enabled
+        saveConfig()
+        restart(ui.games.map { it.packageName })
+    }
+
+    private fun openAddGame() {
+        ui.dialog = GsDialog.AddGame
+        if (ui.installedApps.isNotEmpty() || ui.appsLoading) return
+        ui.appsLoading = true
+        val pm = requireContext().packageManager
+        scope.launch {
+            ui.installedApps = withContext(Dispatchers.IO) {
+                filterInstalledApps(pm = pm, showSystem = true, targeted = emptySet())
+                    .map { app ->
+                        AppListEntry(
+                            packageName = app.packageName,
+                            label = pm.getApplicationLabel(app).toString(),
+                            icon = runCatching { pm.getApplicationIcon(app) }.getOrNull(),
+                            isSystem = app.flags and ApplicationInfo.FLAG_SYSTEM != 0,
+                        )
+                    }
+                    .sortedBy { it.label.lowercase(Locale.getDefault()) }
+            }
+            ui.appsLoading = false
+        }
+    }
+
+    private fun applyProfile(packageName: String, label: String, props: Map<String, String>?) {
+        // null means "Custom": open the property editor, seeded with what is configured.
+        if (props == null) {
+            val existing = ui.games.firstOrNull { it.packageName == packageName }?.props.orEmpty()
+            ui.dialog = GsDialog.EditProps(packageName, label, existing)
+            return
+        }
+        upsertGame(packageName, label, props)
+    }
+
+    private fun saveProps(packageName: String, label: String, props: Map<String, String>) {
+        if (props.isEmpty()) removeGame(packageName) else upsertGame(packageName, label, props)
+    }
+
+    private fun upsertGame(packageName: String, label: String, props: Map<String, String>) {
+        val index = ui.games.indexOfFirst { it.packageName == packageName }
+        if (index >= 0) {
+            ui.games[index] = ui.games[index].copy(props = props)
+        } else {
+            val icon = ui.installedApps.firstOrNull { it.packageName == packageName }?.icon
+            ui.games.add(GameEntry(packageName, label, icon, props))
+            ui.games.sortBy { it.label.lowercase(Locale.getDefault()) }
+        }
+        saveConfig()
+        restart(listOf(packageName))
+    }
+
+    private fun removeGame(packageName: String) {
+        ui.games.removeAll { it.packageName == packageName }
+        saveConfig()
+        restart(listOf(packageName))
+    }
+
+    companion object {
+        private const val TAG = "AppSpoofing"
+        private const val APPPROPS_CONFIG_KEY = "spoof_appprops_config"
+
+        private const val BUILD = "Build"
+        private const val BUILD_VERSION = "Build.VERSION"
+
+        /**
+         * Fields the editor offers, most commonly spoofed first. Names must match the Java
+         * field names exactly; GamePropsSpoofService looks them up in Build, then
+         * Build.VERSION. Only String fields are listed: changing SDK_INT or other numeric
+         * fields in-process breaks framework code inside the game.
+         */
+        internal val SPOOFABLE_FIELDS = listOf(
+            SpoofField("MODEL", BUILD, "SM-S928B"),
+            SpoofField("MANUFACTURER", BUILD, "samsung"),
+            SpoofField("BRAND", BUILD, "samsung"),
+            SpoofField("DEVICE", BUILD, "e3q"),
+            SpoofField("PRODUCT", BUILD, "e3qxxx"),
+            SpoofField("BOARD", BUILD, "pineapple"),
+            SpoofField("HARDWARE", BUILD, "qcom"),
+            SpoofField("SOC_MANUFACTURER", BUILD, "QTI"),
+            SpoofField("SOC_MODEL", BUILD, "SM8650"),
+            SpoofField(
+                "FINGERPRINT", BUILD,
+                "brand/product/device:release/id/incremental:type/tags",
+                Regex("""[^/:\s]+/[^/:\s]+/[^/:\s]+:[^/:\s]+/[^/:\s]+/[^/:\s]+:[^/:\s]+/[^/:\s]+"""),
+            ),
+            SpoofField("ID", BUILD, "UP1A.231005.007", Regex("""\S+""")),
+            SpoofField("DISPLAY", BUILD, "UP1A.231005.007"),
+            SpoofField("TYPE", BUILD, "user", Regex("""user|userdebug|eng""")),
+            SpoofField("TAGS", BUILD, "release-keys", Regex("""\S+""")),
+            SpoofField("RELEASE", BUILD_VERSION, "14", Regex("""\d+(\.\d+){0,2}""")),
+            SpoofField("INCREMENTAL", BUILD_VERSION, "S928BXXU1AWLA", Regex("""\S+""")),
+            SpoofField("SECURITY_PATCH", BUILD_VERSION, "2024-01-01", Regex("""\d{4}-\d{2}-\d{2}""")),
+        )
+
+        internal fun fieldFor(name: String): SpoofField? =
+            SPOOFABLE_FIELDS.firstOrNull { it.name == name }
+
+        internal val PRESET_PROFILES = listOf(
+            "ROG Phone 8 Pro" to mapOf(
+                "BRAND" to "asus", "MANUFACTURER" to "asus", "MODEL" to "ASUS_AI2401_A"),
+            "Galaxy S24 Ultra" to mapOf(
+                "BRAND" to "samsung", "MANUFACTURER" to "samsung", "MODEL" to "SM-S928B"),
+            "Xiaomi 13 Pro" to mapOf(
+                "BRAND" to "Xiaomi", "MANUFACTURER" to "Xiaomi", "MODEL" to "2210132C"),
+            "OnePlus 9 Pro" to mapOf(
+                "BRAND" to "OnePlus", "MANUFACTURER" to "OnePlus", "MODEL" to "LE2101"),
+            "Black Shark 4" to mapOf(
+                "BRAND" to "blackshark", "MANUFACTURER" to "blackshark", "MODEL" to "2SM-X706B"),
+            "Lenovo Y700" to mapOf(
+                "BRAND" to "Lenovo", "MANUFACTURER" to "Lenovo", "MODEL" to "Lenovo TB-9707F"),
+        )
+
+        /**
+         * Index of the preset [props] equals, or -1. Configs saved before presets set BRAND
+         * (MODEL + MANUFACTURER only) still count as that preset.
+         */
+        internal fun profileIndex(props: Map<String, String>): Int =
+            PRESET_PROFILES.indexOfFirst { (_, preset) -> preset == props || preset - "BRAND" == props }
+
+        internal fun profileName(props: Map<String, String>): String? =
+            PRESET_PROFILES.getOrNull(profileIndex(props))?.first
+
+        /** (enabled, games, other top-level keys) from the stored JSON. */
+        private fun parseConfig(
+            content: String?,
+        ): Triple<Boolean, List<Pair<String, Map<String, String>>>, JSONObject> {
+            if (content.isNullOrBlank()) return Triple(false, emptyList(), JSONObject())
+            return try {
+                val json = JSONObject(content)
+                val games = mutableListOf<Pair<String, Map<String, String>>>()
+                // "apps" is the SuperiorOS key; "games" is accepted for crDroid configs.
+                listOfNotNull(json.optJSONObject("games"), json.optJSONObject("apps")).forEach { gamesObj ->
+                    gamesObj.keys().forEach { pkg ->
+                        val propsObj = gamesObj.optJSONObject(pkg) ?: return@forEach
+                        val props = linkedMapOf<String, String>()
+                        propsObj.keys().forEach { k -> props[k] = propsObj.optString(k) }
+                        games += pkg to props
+                    }
+                }
+                val extras = JSONObject()
+                json.keys().forEach { k ->
+                    if (k != "enabled" && k != "games" && k != "apps") extras.put(k, json.get(k))
+                }
+                Triple(json.optBoolean("enabled", false), games, extras)
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to load config", e)
+                Triple(false, emptyList(), JSONObject())
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// UI
+// ---------------------------------------------------------------------------
+
+@Composable
+private fun AppSpoofingContent(
+    state: AppSpoofing.GsUiState,
+    onEnabledChange: (Boolean) -> Unit,
+    onAddGame: () -> Unit,
+    onPickApp: (AppListEntry) -> Unit,
+    onPickProfile: (String, String, Map<String, String>?) -> Unit,
+    onSaveProps: (String, String, Map<String, String>) -> Unit,
+    onRemove: (String) -> Unit,
+) {
+    GsDialogs(state, onPickApp, onPickProfile, onSaveProps, onRemove)
+
+    SpoofScreen {
+        SpoofingHeaderCard(
+            title = stringResource(R.string.game_spoofing_title),
+            subtitle = when {
+                !state.enabled -> stringResource(R.string.gs_disabled)
+                state.games.isEmpty() -> stringResource(R.string.gs_no_apps)
+                else -> stringResource(R.string.gs_configured_count, state.games.size)
+            },
+            checked = state.enabled,
+            onCheckedChange = onEnabledChange,
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.SportsEsports,
+                contentDescription = null,
+                tint = spoofHeaderIconTint(state.enabled),
+            )
+        }
+
+        Spacer(Modifier.height(16.dp))
+        SpoofPrimaryAction(
+            text = stringResource(R.string.gs_add_app),
+            icon = Icons.Rounded.Add,
+            onClick = onAddGame,
+        )
+
+        when {
+            state.loading -> SpoofingLoadingBox(Modifier.padding(vertical = 32.dp))
+            state.games.isEmpty() -> {
+                Spacer(Modifier.height(16.dp))
+                SpoofingEmptyState(
+                    icon = Icons.Rounded.SportsEsports,
+                    title = stringResource(R.string.gs_no_apps),
+                    description = stringResource(R.string.gs_no_apps_summary),
+                )
+            }
+            else -> {
+                Spacer(Modifier.height(8.dp))
+                SectionLabel(
+                    text = stringResource(R.string.gs_configured_apps),
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(SpoofDimens.RowGap)) {
+                    state.games.forEachIndexed { index, game ->
+                        GameCard(
+                            game = game,
+                            dimmed = !state.enabled,
+                            shape = SpoofShapes.forIndex(index, state.games.size),
+                            onEdit = {
+                                state.dialog = AppSpoofing.GsDialog.EditProps(
+                                    game.packageName, game.label, game.props)
+                            },
+                            onProfile = {
+                                state.dialog = AppSpoofing.GsDialog.Profile(
+                                    game.packageName, game.label)
+                            },
+                            onRemove = {
+                                state.dialog = AppSpoofing.GsDialog.Remove(
+                                    game.packageName, game.label)
+                            },
+                        )
+                    }
+                }
+            }
+        }
+
+        SpoofFooter(stringResource(R.string.gs_footer_body))
+    }
+}
+
+@Composable
+private fun GameCard(
+    game: AppSpoofing.GameEntry,
+    dimmed: Boolean,
+    shape: androidx.compose.ui.graphics.Shape,
+    onEdit: () -> Unit,
+    onProfile: () -> Unit,
+    onRemove: () -> Unit,
+) {
+    Surface(
+        onClick = onEdit,
+        shape = shape,
+        color = MaterialTheme.colorScheme.surfaceBright,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                AppIconOrPlaceholder(game.packageName, game.icon, APP_ICON_SIZE_CARD)
+                Spacer(Modifier.width(16.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        game.label,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Text(
+                        game.packageName,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                Spacer(Modifier.width(8.dp))
+                SpoofStatusChip(
+                    text = AppSpoofing.profileName(game.props)
+                        ?: stringResource(R.string.gs_profile_custom),
+                    tone = if (dimmed) SpoofTone.Neutral else SpoofTone.Positive,
+                )
+            }
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = game.props.entries.joinToString("  \u00b7  ") { "${it.key}=${it.value}" },
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(12.dp))
+            SpoofActionRow(
+                listOf(
+                    SpoofAction(stringResource(R.string.gs_edit_props_short), Icons.Rounded.Edit,
+                        onClick = onEdit),
+                    SpoofAction(stringResource(R.string.gs_profile_short), Icons.Rounded.SwapHoriz,
+                        onClick = onProfile),
+                    SpoofAction(stringResource(R.string.gs_remove), Icons.Rounded.DeleteOutline,
+                        onClick = onRemove),
+                ),
+            )
+        }
+    }
+}
+
+@Composable
+private fun GsDialogs(
+    state: AppSpoofing.GsUiState,
+    onPickApp: (AppListEntry) -> Unit,
+    onPickProfile: (String, String, Map<String, String>?) -> Unit,
+    onSaveProps: (String, String, Map<String, String>) -> Unit,
+    onRemove: (String) -> Unit,
+) {
+    val dismiss = { state.dialog = null }
+    when (val dialog = state.dialog) {
+        null -> Unit
+        AppSpoofing.GsDialog.AddGame -> AddGameDialog(
+            loading = state.appsLoading,
+            apps = state.installedApps,
+            configured = state.games.map { it.packageName }.toSet(),
+            onPick = { app -> dismiss(); onPickApp(app) },
+            onDismiss = dismiss,
+        )
+        is AppSpoofing.GsDialog.Profile -> {
+            val current = state.games.firstOrNull { it.packageName == dialog.packageName }?.props
+            val names = AppSpoofing.PRESET_PROFILES.map { it.first } +
+                stringResource(R.string.gs_profile_custom_ellipsis)
+            SpoofChoiceDialog(
+                title = stringResource(R.string.gs_select_profile),
+                options = names,
+                summaries = AppSpoofing.PRESET_PROFILES.map { (_, props) ->
+                    props.values.distinct().joinToString(" \u00b7 ")
+                } + null,
+                selected = current?.let { props ->
+                    AppSpoofing.profileIndex(props)
+                        .takeIf { it >= 0 } ?: AppSpoofing.PRESET_PROFILES.size
+                } ?: -1,
+                onPick = { index ->
+                    onPickProfile(
+                        dialog.packageName, dialog.label,
+                        AppSpoofing.PRESET_PROFILES.getOrNull(index)?.second,
+                    )
+                },
+                onDismiss = dismiss,
+            )
+        }
+        is AppSpoofing.GsDialog.EditProps -> EditPropsDialog(
+            label = dialog.label,
+            initial = dialog.props,
+            onSave = { props -> dismiss(); onSaveProps(dialog.packageName, dialog.label, props) },
+            onDismiss = dismiss,
+        )
+        is AppSpoofing.GsDialog.Remove -> SpoofConfirmDialog(
+            title = stringResource(R.string.gs_remove_title),
+            message = stringResource(R.string.gs_remove_message, dialog.label),
+            confirmText = stringResource(R.string.gs_remove),
+            onConfirm = { onRemove(dialog.packageName) },
+            onDismiss = dismiss,
+            destructive = true,
+        )
+    }
+}
+
+@Composable
+private fun AddGameDialog(
+    loading: Boolean,
+    apps: List<AppListEntry>,
+    configured: Set<String>,
+    onPick: (AppListEntry) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var query by remember { mutableStateOf("") }
+    var showSystem by remember { mutableStateOf(false) }
+    val filtered = remember(apps, configured, query, showSystem) {
+        val q = query.trim().lowercase()
+        apps.filter { app ->
+            app.packageName !in configured &&
+                (showSystem || !app.isSystem) &&
+                (q.isEmpty() || app.label.lowercase().contains(q) ||
+                    app.packageName.lowercase().contains(q))
+        }
+    }
+    SpoofDialog(
+        onDismissRequest = onDismiss,
+        title = stringResource(R.string.gs_select_app),
+        text = {
+            Column {
+                AppPickerSearchField(query = query, onQueryChange = { query = it })
+                Spacer(Modifier.height(8.dp))
+                FilterChip(
+                    selected = showSystem,
+                    onClick = { showSystem = !showSystem },
+                    label = { Text(stringResource(R.string.show_system_apps)) },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Rounded.PhoneAndroid,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                        )
+                    },
+                )
+                Spacer(Modifier.height(8.dp))
+                Box(Modifier.heightIn(min = 120.dp, max = 400.dp)) {
+                    when {
+                        loading -> SpoofingLoadingBox(Modifier.padding(vertical = 32.dp))
+                        filtered.isEmpty() -> Text(
+                            text = stringResource(R.string.gs_no_matching_apps),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(vertical = 24.dp),
+                        )
+                        else -> LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(SpoofDimens.RowGap),
+                        ) {
+                            itemsIndexed(filtered, key = { _, a -> a.packageName }) { index, app ->
+                                Surface(
+                                    onClick = { onPick(app) },
+                                    shape = SpoofShapes.forIndex(index, filtered.size),
+                                    color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                                    modifier = Modifier.fillMaxWidth(),
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(12.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        AppIconOrPlaceholder(app.packageName, app.icon, APP_ICON_SIZE_LIST)
+                                        Spacer(Modifier.width(12.dp))
+                                        Column(Modifier.weight(1f)) {
+                                            Text(
+                                                app.label,
+                                                style = MaterialTheme.typography.bodyLarge,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis,
+                                            )
+                                            Text(
+                                                app.packageName,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(android.R.string.cancel)) }
+        },
+    )
+}
+
+/**
+ * Key/value editor for one game. Each key is picked from [AppSpoofing.SPOOFABLE_FIELDS];
+ * a field already used by another row isn't offered again. Rows with a blank value are
+ * ignored; an empty result removes the game.
+ */
+@Composable
+private fun EditPropsDialog(
+    label: String,
+    initial: Map<String, String>,
+    onSave: (Map<String, String>) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val rows = remember {
+        mutableStateListOf<Pair<String, String>>().apply {
+            addAll(initial.entries.map { it.key to it.value })
+            if (isEmpty()) add(AppSpoofing.SPOOFABLE_FIELDS.first().name to "")
+        }
+    }
+    var error by remember { mutableStateOf<String?>(null) }
+    val invalidKey = stringResource(R.string.gs_invalid_key)
+    val invalidValue = stringResource(R.string.gs_invalid_value)
+    val duplicateKey = stringResource(R.string.gs_duplicate_key)
+
+    val usedKeys = rows.map { it.first }.toSet()
+    val nextFree = AppSpoofing.SPOOFABLE_FIELDS.firstOrNull { it.name !in usedKeys }
+
+    SpoofDialog(
+        onDismissRequest = onDismiss,
+        title = stringResource(R.string.gs_edit_app, label),
+        text = {
+            Column(
+                modifier = Modifier
+                    .heightIn(max = 460.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text(
+                    stringResource(R.string.gs_edit_hint),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                rows.forEachIndexed { index, (key, value) ->
+                    val field = AppSpoofing.fieldFor(key)
+                    val choices = AppSpoofing.SPOOFABLE_FIELDS
+                        .filter { it.name == key || it.name !in usedKeys }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            FieldDropdown(
+                                selected = key,
+                                known = field != null,
+                                options = choices,
+                                onSelect = { rows[index] = it to value; error = null },
+                            )
+                            SpoofTextField(
+                                value = value,
+                                onValueChange = { rows[index] = key to it; error = null },
+                                label = stringResource(R.string.gs_value),
+                                placeholder = field?.example,
+                            )
+                        }
+                        IconButton(onClick = { rows.removeAt(index); error = null }) {
+                            Icon(
+                                Icons.Rounded.Close,
+                                contentDescription = stringResource(R.string.gs_remove),
+                            )
+                        }
+                    }
+                }
+                TextButton(
+                    onClick = { nextFree?.let { rows.add(it.name to "") } },
+                    enabled = nextFree != null,
+                ) {
+                    Icon(Icons.Rounded.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text(stringResource(R.string.gs_add_property))
+                }
+                error?.let {
+                    Text(
+                        it,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                val filled = rows.map { (k, v) -> k.trim() to v.trim() }
+                    .filter { (k, v) -> k.isNotEmpty() && v.isNotEmpty() }
+                val badKey = filled.firstOrNull { AppSpoofing.fieldFor(it.first) == null }
+                val badValue = filled.firstOrNull { (k, v) ->
+                    AppSpoofing.fieldFor(k)?.isValid(v) == false
+                }
+                when {
+                    badKey != null -> error = invalidKey.format(badKey.first)
+                    filled.map { it.first }.toSet().size != filled.size -> error = duplicateKey
+                    badValue != null -> error = invalidValue.format(badValue.first)
+                    else -> onSave(linkedMapOf(*filled.toTypedArray()))
+                }
+            }) { Text(stringResource(R.string.gs_save)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(android.R.string.cancel)) }
+        },
+    )
+}
+
+/**
+ * Read-only field showing the selected Build field name; tapping it opens a menu of
+ * [options]. [known] is false for a key loaded from an older config that isn't in
+ * SPOOFABLE_FIELDS; the field is drawn in the error state until the user picks another.
+ */
+@Composable
+private fun FieldDropdown(
+    selected: String,
+    known: Boolean,
+    options: List<AppSpoofing.SpoofField>,
+    onSelect: (String) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        SpoofTextField(
+            value = selected,
+            onValueChange = {},
+            readOnly = true,
+            label = stringResource(R.string.gs_key),
+            isError = !known,
+            supportingText = AppSpoofing.fieldFor(selected)?.qualifiedName,
+            trailingIcon = {
+                Icon(
+                    if (expanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
+                    contentDescription = null,
+                )
+            },
+        )
+        // TextField consumes taps for focus, so the menu is opened by an overlay instead.
+        Box(
+            Modifier
+                .matchParentSize()
+                .clip(SpoofShapes.field)
+                .clickable { expanded = true },
+        )
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.heightIn(max = 360.dp),
+        ) {
+            options.forEach { option ->
+                DropdownMenuItem(
+                    text = {
+                        Column {
+                            Text(option.name, style = MaterialTheme.typography.bodyLarge)
+                            Text(
+                                option.qualifiedName,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    },
+                    onClick = {
+                        expanded = false
+                        onSelect(option.name)
+                    },
+                    trailingIcon = if (option.name == selected) {
+                        { Icon(Icons.Rounded.Check, contentDescription = null) }
+                    } else {
+                        null
+                    },
+                )
+            }
+        }
+    }
+}
