@@ -37,6 +37,13 @@ SPDX-License-Identifier: Apache-2.0
         android:summary="@string/spoof_ts_summary"
         android:fragment="com.superior.lab.fragments.TrickyStore" />
 
+    <!-- App Spoofing -->
+    <Preference
+        android:key="app_spoofing"
+        android:title="@string/spoof_ap_title"
+        android:summary="@string/spoof_ap_summary"
+        android:fragment="com.superior.lab.fragments.AppSpoofing" />
+
     <!-- Ignore Secure Window -->
     <com.superior.support.preferences.GlobalSettingSwitchPreference
         android:key="window_ignore_secure"
