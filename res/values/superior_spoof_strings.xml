@@ -37,6 +37,8 @@
     <string name="pif_reset_flags_title">Reset spoofing options?</string>
     <string name="pif_reset_flags_message">All spoofing and logging options go back to their defaults. The fingerprint is kept.</string>
     <string name="pif_settings">Settings</string>
+    <string name="pif_spoof_photos">Spoof Google Photos</string>
+    <string name="pif_spoof_photos_summary">Unlimited original quality backup</string>
     <string name="pif_failed">Failed: %s</string>
     <string name="pif_no_devices_found">No devices found</string>
     <string name="pif_no_api_key">Failed to extract Flash Tool API key</string>

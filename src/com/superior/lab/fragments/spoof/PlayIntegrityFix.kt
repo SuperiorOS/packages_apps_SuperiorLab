@@ -136,6 +136,12 @@ class PlayIntegrityFix : SettingsPreferenceFragment() {
             editConfig { it.put(KEY_VERBOSE_LOGS, value) }
         }
 
+        override fun onPhotosChange(enabled: Boolean) {
+            Settings.Secure.putInt(
+                requireContext().contentResolver, PHOTOS_KEY, if (enabled) 1 else 0)
+            ui.photosSpoof = enabled
+        }
+
         override fun onAutoRefreshChange(enabled: Boolean) {
             PifAutoRefresh.setEnabled(requireContext(), enabled)
             refreshStatus()
@@ -221,6 +227,10 @@ class PlayIntegrityFix : SettingsPreferenceFragment() {
         val (entries, values) = verboseArrays()
         val verbose = config[KEY_VERBOSE_LOGS] ?: DEFAULT_VERBOSE_LOGS
         ui.verboseLabel = entries.getOrNull(values.indexOf(verbose)) ?: verbose
+
+        val photos = Settings.Secure.getString(requireContext().contentResolver, PHOTOS_KEY)
+        // Same rule as the framework: unset means enabled.
+        ui.photosSpoof = photos == null || photos == "1" || photos.equals("true", true)
 
         applyAutoRefreshUi()
     }
@@ -371,6 +381,7 @@ class PlayIntegrityFix : SettingsPreferenceFragment() {
         private const val TAG = "PlayIntegrityFix"
         internal const val PIF_CONFIG_KEY = "spoof_pif_config"
         internal const val PIF_CONFIG_NAME = "pif.json"
+        private const val PHOTOS_KEY = "spoof_pif_photos"
 
         internal const val KEY_VENDING_BUILD = "spoofVendingBuild"
         internal const val KEY_VENDING_SDK = "spoofVendingSdk"

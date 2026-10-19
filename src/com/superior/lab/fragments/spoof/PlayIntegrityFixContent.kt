@@ -18,6 +18,7 @@ import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.FileOpen
 import androidx.compose.material.icons.rounded.Fingerprint
 import androidx.compose.material.icons.rounded.History
+import androidx.compose.material.icons.rounded.Photo
 import androidx.compose.material.icons.rounded.Policy
 import androidx.compose.material.icons.automirrored.rounded.Subject
 import androidx.compose.material3.Icon
@@ -54,6 +55,7 @@ internal class PifUiState {
     var config by mutableStateOf<Map<String, String>>(emptyMap())
     var fetching by mutableStateOf(false)
     var fetchStatus by mutableStateOf<String?>(null)
+    var photosSpoof by mutableStateOf(true)
     var verboseLabel by mutableStateOf("")
 
     /** True when the active config was fetched online and can be refreshed daily. */
@@ -77,6 +79,7 @@ internal interface PifActions {
     fun onFlagChange(key: String, value: Boolean)
     fun onVerboseLogs()
     fun onPickVerbose(index: Int)
+    fun onPhotosChange(enabled: Boolean)
     fun onAutoRefreshChange(enabled: Boolean)
 
     /** Returns an error message to keep the edit dialog open, or null once saved. */
@@ -232,6 +235,15 @@ internal fun PlayIntegrityFixContent(state: PifUiState, actions: PifActions) {
         }
 
         SpoofGroup(title = stringResource(R.string.pif_settings)) {
+            item {
+                SpoofSwitchRow(
+                    title = stringResource(R.string.pif_spoof_photos),
+                    summary = stringResource(R.string.pif_spoof_photos_summary),
+                    icon = Icons.Rounded.Photo,
+                    checked = state.photosSpoof,
+                    onCheckedChange = actions::onPhotosChange,
+                )
+            }
             if (state.autoRefreshAvailable) {
                 item {
                     SpoofSwitchRow(
