@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+SPDX-FileCopyrightText: The SuperiorOS Project
+SPDX-License-Identifier: Apache-2.0
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/lab_header_bg" />
+    <corners
+        android:bottomLeftRadius="48dp"
+        android:bottomRightRadius="48dp"
+        android:topLeftRadius="0dp"
+        android:topRightRadius="0dp" />
+</shape>

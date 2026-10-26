@@ -327,4 +327,6 @@ SPDX-License-Identifier: Apache-2.0
     <string name="hide_applist_summary">Prevent apps from checking selected apps from appslist</string>
     <string name="menu_show_overlay">Show overlay</string>
     <string name="menu_hide_overlay">Hide overlay</string>
+
+    <string name="lab_header_tagline">Be Superior</string>
 </resources>

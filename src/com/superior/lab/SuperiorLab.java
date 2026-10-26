@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.UserHandle;
@@ -320,7 +319,8 @@ public class SuperiorLab extends SettingsPreferenceFragment {
                 iconBox.setBackgroundTintList(ColorStateList.valueOf(accentColor));
             }
             if (icon != null) {
-                icon.setImageTintList(ColorStateList.valueOf(Color.WHITE));
+                icon.setImageTintList(ColorStateList.valueOf(
+                        ContextCompat.getColor(context, R.color.lab_tag_text_selected)));
             }
             if (label != null) {
                 label.setText(textOnRes);
