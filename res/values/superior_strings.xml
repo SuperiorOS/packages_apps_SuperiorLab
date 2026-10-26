@@ -451,4 +451,6 @@ SPDX-License-Identifier: Apache-2.0
     <string name="spoof_ap_error_empty_name">Name cannot be empty</string>
     <string name="spoof_ap_profile_saved">Profile saved</string>
     <string name="spoof_ap_save">Save</string>
+
+    <string name="lab_header_tagline">Be Superior</string>
 </resources>

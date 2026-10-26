@@ -7,64 +7,68 @@ SPDX-License-Identifier: Apache-2.0
 
     <color name="homepage_subicon_bg">#000000</color>
 
-    <color name="lab_text_primary">#16181E</color>
-    <color name="lab_text_secondary">#4A5162</color>
+    <color name="lab_text_primary">@android:color/system_neutral1_900</color>
+    <color name="lab_text_secondary">@android:color/system_neutral2_700</color>
 
     <!-- Solid Emerald PIF Pill -->
     <color name="lab_chip_bg">#16A34A</color>
     <color name="lab_chip_text">#FFFFFF</color>
 
     <!-- Quick Toggles Card Container (Light Mode) -->
-    <color name="lab_card_toggles_bg">#EBF1F8</color>
-    <color name="lab_card_toggles_stroke">#D5E0EE</color>
+    <color name="lab_card_toggles_bg">@android:color/system_neutral1_50</color>
+    <color name="lab_card_toggles_stroke">@android:color/system_neutral1_100</color>
 
     <!-- Quick Toggles Dock -->
-    <color name="lab_tag_bg_selected_start">#0066FF</color>
-    <color name="lab_tag_bg_selected_end">#0066FF</color>
-    <color name="lab_tag_bg_unselected">#E9EEF7</color>
-    <color name="lab_tag_stroke_unselected">#D7E0EE</color>
-    <color name="lab_tag_icon_bg_unselected">#DCE3EE</color>
-    <color name="lab_tag_text_selected">#FFFFFF</color>
-    <color name="lab_tag_text_unselected">#4A5162</color>
+    <color name="lab_tag_bg_selected_start">@android:color/system_accent1_600</color>
+    <color name="lab_tag_bg_selected_end">@android:color/system_accent1_600</color>
+    <color name="lab_tag_bg_unselected">@android:color/system_neutral1_100</color>
+    <color name="lab_tag_stroke_unselected">@android:color/system_neutral1_200</color>
+    <color name="lab_tag_icon_bg_unselected">@android:color/system_neutral1_200</color>
+    <color name="lab_tag_text_selected">@android:color/system_accent1_0</color>
+    <color name="lab_tag_text_unselected">@android:color/system_neutral2_700</color>
 
     <!-- M3 Expressive Card Surfaces (Light Mode) -->
-    <color name="lab_card_statusbar">#D8EEFF</color>
-    <color name="lab_card_notifications">#FFE0E3</color>
-    <color name="lab_card_lockscreen">#F2DFFF</color>
-    <color name="lab_card_powermenu">#FFE4D1</color>
-    <color name="lab_card_buttons">#FFF0C2</color>
-    <color name="lab_card_gestures">#CCFBF1</color>
-    <color name="lab_card_misc">#D5F8E3</color>
-    <color name="lab_card_team">#E5DEFF</color>
+    <color name="lab_card_statusbar">@android:color/system_accent1_100</color>
+    <color name="lab_card_notifications">@android:color/system_accent2_100</color>
+    <color name="lab_card_lockscreen">@android:color/system_accent3_100</color>
+    <color name="lab_card_powermenu">@android:color/system_accent1_100</color>
+    <color name="lab_card_buttons">@android:color/system_accent2_100</color>
+    <color name="lab_card_gestures">@android:color/system_accent3_100</color>
+    <color name="lab_card_misc">@android:color/system_accent1_100</color>
+    <color name="lab_card_team">@android:color/system_accent2_100</color>
 
     <!-- M3 Expressive Tonal Typography Colors (Light Mode) -->
-    <color name="lab_text_statusbar">#002B4D</color>
-    <color name="lab_text_notifications">#4D000B</color>
-    <color name="lab_text_lockscreen">#360052</color>
-    <color name="lab_text_powermenu">#4D1D00</color>
-    <color name="lab_text_buttons">#422C00</color>
-    <color name="lab_text_gestures">#00382E</color>
-    <color name="lab_text_misc">#053B1C</color>
-    <color name="lab_text_team">#22005D</color>
+    <color name="lab_text_statusbar">@android:color/system_accent1_900</color>
+    <color name="lab_text_notifications">@android:color/system_accent2_900</color>
+    <color name="lab_text_lockscreen">@android:color/system_accent3_900</color>
+    <color name="lab_text_powermenu">@android:color/system_accent1_900</color>
+    <color name="lab_text_buttons">@android:color/system_accent2_900</color>
+    <color name="lab_text_gestures">@android:color/system_accent3_900</color>
+    <color name="lab_text_misc">@android:color/system_accent1_900</color>
+    <color name="lab_text_team">@android:color/system_accent2_900</color>
 
     <!-- Squircle Icon Backgrounds (Light Mode) -->
-    <color name="lab_icon_statusbar">#0077E6</color>
-    <color name="lab_icon_notifications">#E11D48</color>
-    <color name="lab_icon_lockscreen">#9333EA</color>
-    <color name="lab_icon_powermenu">#EA580C</color>
-    <color name="lab_icon_buttons">#D97706</color>
-    <color name="lab_icon_gestures">#0D9488</color>
-    <color name="lab_icon_misc">#16A34A</color>
-    <color name="lab_icon_team">#6D28D9</color>
+    <color name="lab_icon_statusbar">@android:color/system_accent1_600</color>
+    <color name="lab_icon_notifications">@android:color/system_accent2_600</color>
+    <color name="lab_icon_lockscreen">@android:color/system_accent3_600</color>
+    <color name="lab_icon_powermenu">@android:color/system_accent1_600</color>
+    <color name="lab_icon_buttons">@android:color/system_accent2_600</color>
+    <color name="lab_icon_gestures">@android:color/system_accent3_600</color>
+    <color name="lab_icon_misc">@android:color/system_accent1_600</color>
+    <color name="lab_icon_team">@android:color/system_accent2_600</color>
 
     <!-- Icon Tints -->
-    <color name="lab_icon_tint_statusbar">#FFFFFF</color>
-    <color name="lab_icon_tint_notifications">#FFFFFF</color>
-    <color name="lab_icon_tint_lockscreen">#FFFFFF</color>
-    <color name="lab_icon_tint_powermenu">#FFFFFF</color>
-    <color name="lab_icon_tint_buttons">#FFFFFF</color>
-    <color name="lab_icon_tint_gestures">#FFFFFF</color>
-    <color name="lab_icon_tint_misc">#FFFFFF</color>
-    <color name="lab_icon_tint_team">#FFFFFF</color>
+    <color name="lab_icon_tint_statusbar">@android:color/system_accent1_0</color>
+    <color name="lab_icon_tint_notifications">@android:color/system_accent2_0</color>
+    <color name="lab_icon_tint_lockscreen">@android:color/system_accent3_0</color>
+    <color name="lab_icon_tint_powermenu">@android:color/system_accent1_0</color>
+    <color name="lab_icon_tint_buttons">@android:color/system_accent2_0</color>
+    <color name="lab_icon_tint_gestures">@android:color/system_accent3_0</color>
+    <color name="lab_icon_tint_misc">@android:color/system_accent1_0</color>
+    <color name="lab_icon_tint_team">@android:color/system_accent2_0</color>
 
+    <color name="lab_header_bg">@android:color/system_accent1_100</color>
+    <color name="lab_header_fg">@android:color/system_accent1_900</color>
+    <color name="lab_header_shape">@android:color/system_accent1_600</color>
+    <color name="lab_header_accent">@android:color/system_accent3_300</color>
 </resources>

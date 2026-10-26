@@ -39,7 +39,8 @@ SPDX-License-Identifier: Apache-2.0
                     android:backgroundTint="@color/lab_icon_statusbar">
                     <ImageView
                         style="@style/LabSquircleIcon"
-                        android:src="@drawable/ic_settings_statusbar" />
+                        android:src="@drawable/ic_settings_statusbar"
+                        android:tint="@color/lab_icon_tint_statusbar" />
                 </FrameLayout>
 
                 <Space style="@style/LabCardSpacer" />
@@ -76,7 +77,8 @@ SPDX-License-Identifier: Apache-2.0
                     android:backgroundTint="@color/lab_icon_notifications">
                     <ImageView
                         style="@style/LabSquircleIcon"
-                        android:src="@drawable/ic_settings_notifications" />
+                        android:src="@drawable/ic_settings_notifications"
+                        android:tint="@color/lab_icon_tint_notifications" />
                 </FrameLayout>
 
                 <Space style="@style/LabCardSpacer" />
@@ -123,7 +125,8 @@ SPDX-License-Identifier: Apache-2.0
                     android:backgroundTint="@color/lab_icon_lockscreen">
                     <ImageView
                         style="@style/LabSquircleIcon"
-                        android:src="@drawable/ic_settings_lockscreens" />
+                        android:src="@drawable/ic_settings_lockscreens"
+                        android:tint="@color/lab_icon_tint_lockscreen" />
                 </FrameLayout>
 
                 <Space style="@style/LabCardSpacer" />
@@ -160,7 +163,8 @@ SPDX-License-Identifier: Apache-2.0
                     android:backgroundTint="@color/lab_icon_powermenu">
                     <ImageView
                         style="@style/LabSquircleIcon"
-                        android:src="@drawable/ic_settings_powermenu" />
+                        android:src="@drawable/ic_settings_powermenu"
+                        android:tint="@color/lab_icon_tint_powermenu" />
                 </FrameLayout>
 
                 <Space style="@style/LabCardSpacer" />
@@ -207,7 +211,8 @@ SPDX-License-Identifier: Apache-2.0
                     android:backgroundTint="@color/lab_icon_buttons">
                     <ImageView
                         style="@style/LabSquircleIcon"
-                        android:src="@drawable/ic_settings_buttons" />
+                        android:src="@drawable/ic_settings_buttons"
+                        android:tint="@color/lab_icon_tint_buttons" />
                 </FrameLayout>
 
                 <Space style="@style/LabCardSpacer" />
@@ -243,7 +248,8 @@ SPDX-License-Identifier: Apache-2.0
                     android:backgroundTint="@color/lab_icon_gestures">
                     <ImageView
                         style="@style/LabSquircleIcon"
-                        android:src="@drawable/ic_settings_sos_gestures" />
+                        android:src="@drawable/ic_settings_sos_gestures"
+                        android:tint="@color/lab_icon_tint_gestures" />
                 </FrameLayout>
 
                 <Space style="@style/LabCardSpacer" />
@@ -274,7 +280,8 @@ SPDX-License-Identifier: Apache-2.0
             android:backgroundTint="@color/lab_icon_misc">
             <ImageView
                 style="@style/LabSquircleIcon"
-                android:src="@drawable/ic_settings_miscs" />
+                android:src="@drawable/ic_settings_miscs"
+                android:tint="@color/lab_icon_tint_misc" />
         </FrameLayout>
 
         <LinearLayout
@@ -308,7 +315,8 @@ SPDX-License-Identifier: Apache-2.0
             android:backgroundTint="@color/lab_icon_team">
             <ImageView
                 style="@style/LabSquircleIcon"
-                android:src="@drawable/ic_settings_team" />
+                android:src="@drawable/ic_settings_team"
+                android:tint="@color/lab_icon_tint_team" />
         </FrameLayout>
 
         <LinearLayout

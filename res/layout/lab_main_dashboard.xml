@@ -10,6 +10,9 @@ SPDX-License-Identifier: Apache-2.0
     android:orientation="vertical"
     android:background="@android:color/transparent">
 
+    <!-- 0. Header -->
+    <include layout="@layout/lab_header" />
+
     <!-- 1. M3 Expressive 2x2 Quick Toggles Dock -->
     <include layout="@layout/lab_scrollable_tags" />
 

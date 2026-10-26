@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+SPDX-FileCopyrightText: The SuperiorOS Project
+SPDX-License-Identifier: Apache-2.0
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/lab_header"
+    android:layout_width="match_parent"
+    android:layout_height="220dp"
+    android:layout_marginBottom="12dp"
+    android:background="@drawable/bg_lab_header"
+    android:clipToOutline="true">
+
+    <ImageView
+        android:layout_width="230dp"
+        android:layout_height="230dp"
+        android:layout_gravity="top|end"
+        android:layout_marginEnd="-56dp"
+        android:layout_marginTop="-48dp"
+        android:alpha="0.18"
+        android:importantForAccessibility="no"
+        android:src="@drawable/lab_shape_cookie"
+        android:tint="@color/lab_header_shape" />
+
+    <ImageView
+        android:layout_width="76dp"
+        android:layout_height="76dp"
+        android:layout_gravity="center_vertical|end"
+        android:layout_marginEnd="32dp"
+        android:layout_marginTop="40dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/lab_shape_sunny"
+        android:tint="@color/lab_header_accent" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="28dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/header_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:lineSpacingMultiplier="0.95"
+            android:text="@string/superior_lab_title"
+            android:textColor="@color/lab_header_fg"
+            android:textSize="44sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/header_sub"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:alpha="0.85"
+            android:text="@string/lab_header_tagline"
+            android:textColor="@color/lab_header_fg"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</FrameLayout>
